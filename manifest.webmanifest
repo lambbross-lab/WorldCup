@@ -1,0 +1,9 @@
+{
+  "name": "FIFA World Cup 2026",
+  "short_name": "World Cup 2026",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#071225",
+  "theme_color": "#071225",
+  "icons": []
+}
