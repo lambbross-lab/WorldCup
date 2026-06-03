@@ -222,6 +222,169 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
   }
 }
 
+
+/* V14 mejoras móvil */
+.match:before{display:none !important}
+
+@media(max-width:760px){
+  header{
+    padding:22px 18px 18px !important;
+  }
+  .ball{
+    width:34px !important;
+    height:34px !important;
+    font-size:.9rem !important;
+  }
+  .logo{
+    font-size:.78rem !important;
+    margin-bottom:10px !important;
+    gap:9px !important;
+  }
+  h1{
+    font-size:clamp(2.35rem,13vw,3.9rem) !important;
+    line-height:.9 !important;
+  }
+  .sub{
+    font-size:1rem !important;
+    line-height:1.35 !important;
+    margin-top:10px !important;
+  }
+  .panel{
+    margin-top:10px !important;
+    padding:14px !important;
+    border-radius:24px !important;
+  }
+  .tabs{
+    flex-wrap:nowrap !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    padding-bottom:2px !important;
+    gap:8px !important;
+  }
+  .tabs::-webkit-scrollbar{display:none !important}
+  .tabs button{
+    flex:0 0 auto !important;
+    white-space:nowrap !important;
+    padding:10px 14px !important;
+    border-radius:14px !important;
+    font-size:.88rem !important;
+  }
+  .tools{
+    gap:9px !important;
+    margin-top:12px !important;
+  }
+  input,select{
+    font-size:15px !important;
+    padding:11px 12px !important;
+    border-radius:14px !important;
+  }
+  .darkbtn{
+    padding:11px 12px !important;
+  }
+  .home-compact{
+    padding:14px !important;
+    margin:14px 0 !important;
+    border-radius:22px !important;
+  }
+  .home-info{
+    grid-template-columns:1fr 1fr !important;
+    gap:12px !important;
+  }
+  .home-info h2{
+    font-size:1.22rem !important;
+    line-height:1.1 !important;
+  }
+  .home-info p{
+    font-size:.92rem !important;
+    line-height:1.32 !important;
+    margin-top:7px !important;
+  }
+  .section-title{
+    margin:18px 0 10px !important;
+  }
+  .day{
+    font-size:1rem !important;
+    padding:8px 12px !important;
+  }
+  .match{
+    padding:14px !important;
+    border-radius:24px !important;
+  }
+  .meta{
+    font-size:.88rem !important;
+    gap:7px !important;
+  }
+  .tag{
+    font-size:.78rem !important;
+    padding:5px 8px !important;
+  }
+  .match .teams{
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) !important;
+    gap:10px !important;
+    margin:16px 0 !important;
+  }
+  .match .team{
+    gap:8px !important;
+    min-width:0 !important;
+  }
+  .match .team.right{
+    justify-content:flex-end !important;
+    text-align:right !important;
+  }
+  .match .name{
+    font-size:.86rem !important;
+    line-height:1.05 !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    display:block !important;
+    max-width:82px !important;
+    word-break:normal !important;
+  }
+  .match .flag-img{
+    width:32px !important;
+    height:22px !important;
+    flex:0 0 auto !important;
+  }
+  .match .score{
+    padding:7px !important;
+    border-radius:16px !important;
+  }
+  .match .score input{
+    width:43px !important;
+    height:47px !important;
+    font-size:1.18rem !important;
+    padding:6px !important;
+  }
+  .details{
+    gap:7px !important;
+    margin-top:7px !important;
+  }
+  .pill{
+    font-size:.82rem !important;
+    padding:6px 9px !important;
+    border-radius:999px !important;
+  }
+  .tv{
+    font-size:.82rem !important;
+    font-weight:800 !important;
+    color:#9f1f2c !important;
+    background:#fff7f7 !important;
+  }
+  .footer-note{
+    font-size:.76rem !important;
+  }
+}
+
+/* Desktop/tablet: country names should not ellipsize unnecessarily */
+@media(min-width:761px){
+  .match .name{
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -318,11 +481,11 @@ function renderHome(){
     <div class="home-info">
       <div>
         <h2>🏆 Próximos partidos</h2>
-        <p>Solo se muestran los siguientes encuentros sin resultado.</p>
+        <p>Solo encuentros pendientes.</p>
       </div>
       <div>
         <h2>📊 Automático</h2>
-        <p>La app calcula PJ, G, E, P, GF, GC, DG, puntos, posiciones y cruces.</p>
+        <p>Clasificaciones y cruces en tiempo real.</p>
       </div>
     </div>
   </div>
@@ -332,7 +495,7 @@ function renderHome(){
 function go(tab){document.querySelector(".tabs .active").classList.remove("active");document.querySelector(`[data-tab="${tab}"]`).classList.add("active");activeTab=tab;render();}
 function renderCalendar(ms){let by={};ms.forEach(m=>(by[m.dateSpain]??=[]).push(m));view.innerHTML=Object.keys(by).sort().map(d=>`<div class="section-title"><span class="day">${fmtDate(d)}</span></div><div class="grid">${by[d].map(matchCard).join("")}</div>`).join("")||`<div class="card"><h3>Sin partidos</h3><p>No hay partidos con ese filtro.</p></div>`}
 function renderByGroups(){view.innerHTML=Object.keys(GROUPS).map(g=>`<div class="section-title"><span class="day">Grupo ${g}</span></div><div class="grid">${MATCHES.filter(m=>m.group===g&&matchVisible(m)).map(matchCard).join("")}</div>`).join("")}
-function matchCard(m){let s=getScore(m.id),h=s.h??"",a=s.a??"";let tv=(m.home==="Spain"||m.away==="Spain"||m.id===1)?"RTVE · RTVE Play · DAZN · Movistar Plus+":"DAZN · Movistar Plus+";return `<article class="match"><div class="meta"><span class="tag">Partido ${m.id}</span><span class="g">Grupo ${m.group}</span><span>🇪🇸 ${shortDate(m.dateSpain)} · ${m.timeSpain}</span></div><div class="teams"><div class="team">${flagHtml(m.home)}<span class="name">${teamName(m.home)}</span></div><div class="score"><input type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="${h}" onchange="setScore(${m.id},'h',this.value)"> <b>:</b> <input type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="${a}" onchange="setScore(${m.id},'a',this.value)"></div><div class="team right"><span class="name">${teamName(m.away)}</span>${flagHtml(m.away)}</div></div><div class="details"><span class="pill">🌍 Local: ${shortDate(m.localDate)} · ${m.localTime}</span><span class="pill">🇪🇸 España: ${shortDate(m.dateSpain)} · ${m.timeSpain}</span><span class="pill tv">📺 ${tv}</span></div><div class="details"><span class="pill">📍 ${m.venue||"Sede pendiente"}</span></div></article>`}
+function matchCard(m){let s=getScore(m.id),h=s.h??"",a=s.a??"";let tv=(m.home==="Spain"||m.away==="Spain"||m.id===1)?"RTVE · DAZN · Movistar+":"DAZN · Movistar+";return `<article class="match"><div class="meta"><span class="tag">Partido ${m.id}</span><span class="g">Grupo ${m.group}</span><span>🇪🇸 ${shortDate(m.dateSpain)} · ${m.timeSpain}</span></div><div class="teams"><div class="team">${flagHtml(m.home)}<span class="name">${teamName(m.home)}</span></div><div class="score"><input type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="${h}" onchange="setScore(${m.id},'h',this.value)"> <b>:</b> <input type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="${a}" onchange="setScore(${m.id},'a',this.value)"></div><div class="team right"><span class="name">${teamName(m.away)}</span>${flagHtml(m.away)}</div></div><div class="details"><span class="pill">🌍 Local: ${shortDate(m.localDate)} · ${m.localTime}</span><span class="pill">🇪🇸 España: ${shortDate(m.dateSpain)} · ${m.timeSpain}</span><span class="pill tv">📺 ${tv}</span></div><div class="details"><span class="pill">📍 ${m.venue||"Sede pendiente"}</span></div></article>`}
 function renderStandings(){let thirds=thirdRanking();view.innerHTML=`<div class="section-title"><span class="day">Clasificaciones</span></div><div class="groups">${Object.keys(GROUPS).map(groupTable).join("")}</div><div class="section-title"><span class="day">Mejores terceros</span></div><div class="card" style="overflow:auto"><table><thead><tr><th>#</th><th>Grupo</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th></tr></thead><tbody>${thirds.map((r,i)=>`<tr class="${i<8?'third':''}"><td>${i+1}</td><td>${r.group}</td><td>${standingFlagHtml(r)}${r.name}</td><td>${r.PJ}</td><td>${r.G}</td><td>${r.E}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GC}</td><td>${r.DG}</td><td><b>${r.PTS}</b></td></tr>`).join("")}</tbody></table></div>`}
 function groupTable(g){return `<div class="card"><h3>Grupo ${g}</h3><table><thead><tr><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th></tr></thead><tbody>${standings(g).map((r,i)=>`<tr class="${i<2?'qual':i===2?'third':''}"><td>${standingFlagHtml(r)}${r.name}</td><td>${r.PJ}</td><td>${r.G}</td><td>${r.E}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GC}</td><td>${r.DG}</td><td><b>${r.PTS}</b></td></tr>`).join("")}</tbody></table><p class="note">1.º y 2.º pasan. El 3.º entra en el ranking de terceros.</p></div>`}
 function renderKO(){const labels={r32:"Dieciseisavos",r16:"Octavos",qf:"Cuartos",sf:"Semifinales",third:"Tercer puesto",final:"Final"};view.innerHTML=`<div class="section-title"><span class="day">Eliminatorias</span></div><div class="stage-tabs">${Object.entries(labels).map(([k,v])=>`<button class="${activeRound===k?'active-stage':''}" onclick="activeRound='${k}';renderKO()">${v}</button>`).join("")}</div><div class="knock">${KO.filter(m=>m.round===activeRound).map(koCard).join("")}</div><div class="champion"><div class="cup">🏆</div><h2>Campeón</h2><p>${koWinner(104).name||"A definir"}</p></div>`}
