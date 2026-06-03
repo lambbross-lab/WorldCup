@@ -1,1 +1,1 @@
-Versión v14: mejoras móviles, header más compacto, pestañas con scroll horizontal, nombres de países más legibles, TV más discreta, sin balón fantasma e iconos PWA.
+Versión v15: ajuste móvil para nombres largos cerca del marcador y nuevo icono PWA basado en la copa enviada.
