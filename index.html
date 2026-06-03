@@ -5,19 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FIFA World Cup 2026 · Lamb Bros Studio</title>
 <meta name="theme-color" content="#071225">
-
-<!-- Google Analytics 4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-02NZFC1B4B"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-02NZFC1B4B', {
-    page_path: window.location.pathname
-  });
-</script>
-
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root {
@@ -643,6 +630,74 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .modal-card h3{margin:18px 0 8px}
 .modal-card p,.modal-card li{line-height:1.45}
 
+
+/* V19: banner cookies discreto */
+.cookie-banner{
+  position:fixed;
+  left:12px;
+  right:12px;
+  bottom:12px;
+  z-index:10000;
+  background:rgba(5,5,5,.96);
+  color:#dbe5f0;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:12px;
+  box-shadow:0 18px 50px rgba(0,0,0,.45);
+  display:grid;
+  gap:10px;
+  max-width:760px;
+  margin:auto;
+}
+.cookie-banner[hidden]{display:none !important}
+.cookie-text{
+  font-size:.84rem;
+  line-height:1.35;
+}
+.cookie-actions{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+.cookie-actions button{
+  padding:8px 12px;
+  border-radius:12px;
+  font-size:.84rem;
+}
+.cookie-accept{
+  background:var(--gold) !important;
+  color:#111 !important;
+}
+.cookie-reject{
+  background:#1b2438 !important;
+  color:#fff !important;
+}
+.cookie-link{
+  color:#f1c75b;
+  text-decoration:none;
+  font-weight:800;
+}
+.privacy-small{
+  font-size:.78rem;
+  color:#8fa3c4;
+  margin-top:6px;
+}
+@media(max-width:760px){
+  .cookie-banner{
+    left:10px;
+    right:10px;
+    bottom:10px;
+    padding:11px;
+  }
+  .cookie-actions{
+    justify-content:stretch;
+  }
+  .cookie-actions button{
+    flex:1;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -854,6 +909,101 @@ render(); if("serviceWorker" in navigator){navigator.serviceWorker.register("./s
 
   modalClose?.addEventListener('click', closeModal);
   modal?.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+})();
+</script>
+
+
+<div id="cookieBanner" class="cookie-banner" hidden>
+  <div class="cookie-text">
+    🍪 Usamos Google Analytics para conocer visitas y mejorar la app. No usamos anuncios ni vendemos datos.
+    <div class="privacy-small">Puedes aceptar o rechazar. Tu elección se guarda en este dispositivo.</div>
+  </div>
+  <div class="cookie-actions">
+    <button id="cookieReject" class="cookie-reject">Rechazar</button>
+    <button id="cookieAccept" class="cookie-accept">Aceptar</button>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  const GA_ID = 'G-02NZFC1B4B';
+  const CONSENT_KEY = 'analyticsConsent_v19';
+  const banner = document.getElementById('cookieBanner');
+  const accept = document.getElementById('cookieAccept');
+  const reject = document.getElementById('cookieReject');
+
+  function isStandalone(){
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  function loadAnalytics(){
+    if(window.__gaLoaded) return;
+    window.__gaLoaded = true;
+
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(s);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){ dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', GA_ID, {
+      page_path: window.location.pathname,
+      page_title: document.title
+    });
+
+    if(isStandalone()){
+      gtag('event', 'app_open_standalone', {
+        event_category: 'pwa',
+        event_label: 'opened_from_home_screen'
+      });
+    }
+  }
+
+  function showBannerIfNeeded(){
+    const consent = localStorage.getItem(CONSENT_KEY);
+    if(consent === 'accepted') {
+      loadAnalytics();
+      return;
+    }
+    if(consent === 'rejected') return;
+    if(banner) banner.hidden = false;
+  }
+
+  accept?.addEventListener('click', () => {
+    localStorage.setItem(CONSENT_KEY, 'accepted');
+    if(banner) banner.hidden = true;
+    loadAnalytics();
+    if(window.gtag){
+      gtag('event', 'analytics_consent_accept', {
+        event_category: 'privacy'
+      });
+    }
+  });
+
+  reject?.addEventListener('click', () => {
+    localStorage.setItem(CONSENT_KEY, 'rejected');
+    if(banner) banner.hidden = true;
+  });
+
+  document.addEventListener('DOMContentLoaded', showBannerIfNeeded);
+})();
+</script>
+
+
+<script>
+(function(){
+  const installBtn = document.getElementById('installBtn');
+  installBtn?.addEventListener('click', () => {
+    if(window.gtag){
+      gtag('event', 'install_help_open', {
+        event_category: 'pwa',
+        event_label: 'install_button'
+      });
+    }
+  });
 })();
 </script>
 

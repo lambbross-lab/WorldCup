@@ -1,1 +1,1 @@
-Versión v18: iconos instalar/ayuda movidos al header, barra inferior eliminada, footer con logo más visible, tarjetas sin duplicar hora de España y con hora local conservada.
+Versión v19: Google Analytics con consentimiento, banner discreto de cookies, medición de apertura como PWA instalada y evento de botón instalar.
