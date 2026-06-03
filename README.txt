@@ -1,1 +1,1 @@
-Versión v16: tarjetas móviles más compactas, se mantiene hora local sin duplicar hora España, footer con logo visible y compacto.
+Versión v18: iconos instalar/ayuda movidos al header, barra inferior eliminada, footer con logo más visible, tarjetas sin duplicar hora de España y con hora local conservada.

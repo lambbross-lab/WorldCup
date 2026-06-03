@@ -506,11 +506,141 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
   }
 }
 
+
+/* V17 */
+.home-compact{display:none !important}
+.home-actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:14px 0 18px;
+  padding:10px 4px;
+}
+.home-brand{
+  font-weight:900;
+  letter-spacing:.04em;
+  color:#d9e5ff;
+}
+.home-icons{
+  display:flex;
+  gap:8px;
+}
+.icon-btn{
+  border:1px solid rgba(255,255,255,.12);
+  background:#121b2f;
+  border-radius:12px;
+  padding:8px 10px;
+  cursor:pointer;
+}
+
+
+/* V18: acciones en header, sin barra inferior duplicada */
+.logo-row{
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  margin-bottom:12px !important;
+}
+.logo-row .logo{
+  margin-bottom:0 !important;
+}
+.header-actions{
+  display:flex !important;
+  gap:8px !important;
+  align-items:center !important;
+}
+.header-actions .icon-btn{
+  border:1px solid rgba(255,255,255,.14) !important;
+  background:#121b2f !important;
+  color:white !important;
+  border-radius:12px !important;
+  padding:8px 10px !important;
+  cursor:pointer !important;
+  line-height:1 !important;
+  box-shadow:0 8px 18px rgba(0,0,0,.18) !important;
+}
+.home-actions{display:none !important}
+.home-brand,.home-icons{display:none !important}
+
+/* V18: footer logo más visible */
+.site-footer .footer-logo{
+  height:70px !important;
+  width:auto !important;
+  opacity:1 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  border:0 !important;
+}
+
+/* V18: tarjeta conserva hora local, sin duplicar hora España */
+@media(max-width:760px){
+  .header-actions .icon-btn{
+    padding:7px 9px !important;
+    font-size:.95rem !important;
+  }
+  .site-footer .footer-logo{
+    height:64px !important;
+  }
+  .match{
+    padding:12px !important;
+  }
+  .details{
+    gap:6px !important;
+    margin-top:6px !important;
+  }
+  .pill{
+    font-size:.78rem !important;
+    padding:5px 8px !important;
+  }
+}
+
+
+/* V18 modal ayuda/instalación */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.62);
+  display:grid;
+  place-items:center;
+  z-index:9999;
+  padding:18px;
+}
+.modal[hidden]{display:none !important}
+.modal-card{
+  width:min(560px,100%);
+  background:#fff4df;
+  color:#111827;
+  border-radius:24px;
+  padding:22px;
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+  position:relative;
+}
+.modal-close{
+  position:absolute;
+  top:10px;
+  right:12px;
+  background:#111827;
+  color:#fff;
+  border-radius:999px;
+  width:34px;
+  height:34px;
+  padding:0;
+}
+.modal-card h2{margin:0 0 12px}
+.modal-card h3{margin:18px 0 8px}
+.modal-card p,.modal-card li{line-height:1.45}
+
 </style>
 </head>
 <body>
 <header>
+  <div class="logo-row">
   <div class="logo"><div class="ball">⚽</div><span>Cuaderno digital</span></div>
+  <div class="header-actions">
+    <button class="icon-btn" id="installBtn" title="Instalar app" aria-label="Instalar app">📲</button>
+    <button class="icon-btn" id="helpBtn" title="Ayuda" aria-label="Ayuda">❓</button>
+  </div>
+</div>
   <div class="hero-title">
     <h1>FIFA World Cup<br>2026</h1>
     <p class="sub">Introduce resultados. La app calcula automáticamente clasificaciones, goles, puntos y posiciones.</p>
@@ -598,25 +728,15 @@ function flagForResolved(t, mini=false){return t.id ? flagHtml(t.id, mini) : `<s
 function render(){if(activeTab==="inicio")return renderHome(); if(activeTab==="clasificaciones")return renderStandings(); if(activeTab==="eliminatorias")return renderKO(); if(activeTab==="grupos")return renderByGroups(); return renderCalendar(MATCHES.filter(matchVisible));}
 function renderHome(){
   let next=MATCHES.filter(m=>!played(m)).slice(0,5);
-  view.innerHTML=`<div class="home-compact">
-    <div class="home-info">
-      <div>
-        <h2>🏆 Próximos partidos</h2>
-        <p>Solo encuentros pendientes.</p>
-      </div>
-      <div>
-        <h2>📊 Automático</h2>
-        <p>Clasificaciones y cruces en tiempo real.</p>
-      </div>
-    </div>
-  </div>
-  <div class="section-title"><span class="day">Siguientes 5 partidos</span></div>
+  view.innerHTML=`
+<div class="section-title"><span class="day">Siguientes 5 partidos</span></div>
+
   <div class="grid">${next.map(matchCard).join("")}</div>`
 }
 function go(tab){document.querySelector(".tabs .active").classList.remove("active");document.querySelector(`[data-tab="${tab}"]`).classList.add("active");activeTab=tab;render();}
 function renderCalendar(ms){let by={};ms.forEach(m=>(by[m.dateSpain]??=[]).push(m));view.innerHTML=Object.keys(by).sort().map(d=>`<div class="section-title"><span class="day">${fmtDate(d)}</span></div><div class="grid">${by[d].map(matchCard).join("")}</div>`).join("")||`<div class="card"><h3>Sin partidos</h3><p>No hay partidos con ese filtro.</p></div>`}
 function renderByGroups(){view.innerHTML=Object.keys(GROUPS).map(g=>`<div class="section-title"><span class="day">Grupo ${g}</span></div><div class="grid">${MATCHES.filter(m=>m.group===g&&matchVisible(m)).map(matchCard).join("")}</div>`).join("")}
-function matchCard(m){let s=getScore(m.id),h=s.h??"",a=s.a??"";let tv=(m.home==="Spain"||m.away==="Spain"||m.id===1)?"RTVE · DAZN · Movistar+":"DAZN · Movistar+";return `<article class="match"><div class="meta"><span class="tag">Partido ${m.id}</span><span class="g">Grupo ${m.group}</span><span>🇪🇸 ${shortDate(m.dateSpain)} · ${m.timeSpain}</span></div><div class="teams"><div class="team">${flagHtml(m.home)}<span class="name">${teamName(m.home)}</span></div><div class="score"><input type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="${h}" onchange="setScore(${m.id},'h',this.value)"> <b>:</b> <input type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="${a}" onchange="setScore(${m.id},'a',this.value)"></div><div class="team right"><span class="name">${teamName(m.away)}</span>${flagHtml(m.away)}</div></div><div class="details"><span class="pill">🌍 Local ${m.localTime}</span><span class="pill tv">📺 ${tv}</span></div><div class="details"><span class="pill">📍 ${m.venue||"Sede pendiente"}</span></div></article>`}
+function matchCard(m){let s=getScore(m.id),h=s.h??"",a=s.a??"";let tv=(m.home==="Spain"||m.away==="Spain"||m.id===1)?"RTVE · DAZN · Movistar+":"DAZN · Movistar+";return `<article class="match"><div class="meta"><span class="tag">Partido ${m.id}</span><span class="g">Grupo ${m.group}</span><span>🇪🇸 ${shortDate(m.dateSpain)} · ${m.timeSpain}</span></div><div class="teams"><div class="team">${flagHtml(m.home)}<span class="name">${teamName(m.home)}</span></div><div class="score"><input type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="${h}" onchange="setScore(${m.id},'h',this.value)"> <b>:</b> <input type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="${a}" onchange="setScore(${m.id},'a',this.value)"></div><div class="team right"><span class="name">${teamName(m.away)}</span>${flagHtml(m.away)}</div></div><div class="details"><span class="pill">🌍 Local: ${shortDate(m.localDate)} · ${m.localTime}</span><span class="pill tv">📺 ${tv}</span></div><div class="details"><span class="pill">📍 ${m.venue||"Sede pendiente"}</span></div></article>`}
 function renderStandings(){let thirds=thirdRanking();view.innerHTML=`<div class="section-title"><span class="day">Clasificaciones</span></div><div class="groups">${Object.keys(GROUPS).map(groupTable).join("")}</div><div class="section-title"><span class="day">Mejores terceros</span></div><div class="card" style="overflow:auto"><table><thead><tr><th>#</th><th>Grupo</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th></tr></thead><tbody>${thirds.map((r,i)=>`<tr class="${i<8?'third':''}"><td>${i+1}</td><td>${r.group}</td><td>${standingFlagHtml(r)}${r.name}</td><td>${r.PJ}</td><td>${r.G}</td><td>${r.E}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GC}</td><td>${r.DG}</td><td><b>${r.PTS}</b></td></tr>`).join("")}</tbody></table></div>`}
 function groupTable(g){return `<div class="card"><h3>Grupo ${g}</h3><table><thead><tr><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th></tr></thead><tbody>${standings(g).map((r,i)=>`<tr class="${i<2?'qual':i===2?'third':''}"><td>${standingFlagHtml(r)}${r.name}</td><td>${r.PJ}</td><td>${r.G}</td><td>${r.E}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GC}</td><td>${r.DG}</td><td><b>${r.PTS}</b></td></tr>`).join("")}</tbody></table><p class="note">1.º y 2.º pasan. El 3.º entra en el ranking de terceros.</p></div>`}
 function renderKO(){const labels={r32:"Dieciseisavos",r16:"Octavos",qf:"Cuartos",sf:"Semifinales",third:"Tercer puesto",final:"Final"};view.innerHTML=`<div class="section-title"><span class="day">Eliminatorias</span></div><div class="stage-tabs">${Object.entries(labels).map(([k,v])=>`<button class="${activeRound===k?'active-stage':''}" onclick="activeRound='${k}';renderKO()">${v}</button>`).join("")}</div><div class="knock">${KO.filter(m=>m.round===activeRound).map(koCard).join("")}</div><div class="champion"><div class="cup">🏆</div><h2>Campeón</h2><p>${koWinner(104).name||"A definir"}</p></div>`}
@@ -655,5 +775,74 @@ render(); if("serviceWorker" in navigator){navigator.serviceWorker.register("./s
     <div class="footer-sub">Guía independiente. No oficial de la FIFA.</div>
   </div>
 </footer>
+
+<div id="infoModal" class="modal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose" aria-label="Cerrar">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  const installBtn = document.getElementById('installBtn');
+  const helpBtn = document.getElementById('helpBtn');
+  const modal = document.getElementById('infoModal');
+  const modalContent = document.getElementById('modalContent');
+  const modalClose = document.getElementById('modalClose');
+
+  function isStandalone(){
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  if(installBtn && isStandalone()){
+    installBtn.style.display = 'none';
+  }
+
+  function openModal(html){
+    modalContent.innerHTML = html;
+    modal.hidden = false;
+  }
+
+  function closeModal(){
+    modal.hidden = true;
+  }
+
+  installBtn?.addEventListener('click', () => openModal(`
+    <h2>📲 Instalar como app</h2>
+    <h3>iPhone</h3>
+    <ol>
+      <li>Abre esta web en Safari.</li>
+      <li>Pulsa el botón Compartir.</li>
+      <li>Elige “Añadir a pantalla de inicio”.</li>
+      <li>Confirma.</li>
+    </ol>
+    <h3>Android</h3>
+    <ol>
+      <li>Abre esta web en Chrome.</li>
+      <li>Pulsa el menú ⋮.</li>
+      <li>Elige “Añadir a pantalla de inicio” o “Instalar app”.</li>
+      <li>Confirma.</li>
+    </ol>
+  `));
+
+  helpBtn?.addEventListener('click', () => openModal(`
+    <h2>❓ Ayuda</h2>
+    <ul>
+      <li>Introduce únicamente los resultados de cada partido.</li>
+      <li>Las clasificaciones se calculan automáticamente.</li>
+      <li>Los cruces de eliminatorias se generan automáticamente.</li>
+      <li>Si hay empate en eliminatorias, añade prórroga y, si sigue empatado, penaltis.</li>
+      <li>Los datos se guardan en este dispositivo.</li>
+      <li>La hora principal es la hora de España. También se muestra la hora local del partido.</li>
+    </ul>
+  `));
+
+  modalClose?.addEventListener('click', closeModal);
+  modal?.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+})();
+</script>
+
 </body>
 </html>
