@@ -777,7 +777,35 @@ function setKoScore(id,side,val){koScores[id]={...koScores[id],[side]:val===""?"
 function matchVisible(m){const q=search.value.trim().toLowerCase(), gf=groupFilter.value;if(gf&&m.group!==gf)return false;if(q&&!(teamName(m.home).toLowerCase().includes(q)||teamName(m.away).toLowerCase().includes(q)))return false;return true}
 function standings(g){let rows=GROUPS[g].map((t,i)=>({id:t[0],name:t[1],flag:t[2],idx:i,PJ:0,G:0,E:0,P:0,GF:0,GC:0,DG:0,PTS:0}));let map=Object.fromEntries(rows.map(r=>[r.id,r]));MATCHES.filter(m=>m.group===g).forEach(m=>{if(!played(m))return;let s=getScore(m.id),a=map[m.home],b=map[m.away];a.PJ++;b.PJ++;a.GF+=s.h;a.GC+=s.a;b.GF+=s.a;b.GC+=s.h;if(s.h>s.a){a.G++;b.P++;a.PTS+=3}else if(s.h<s.a){b.G++;a.P++;b.PTS+=3}else{a.E++;b.E++;a.PTS++;b.PTS++}});rows.forEach(r=>r.DG=r.GF-r.GC);return rows.sort((a,b)=>b.PTS-a.PTS||b.DG-a.DG||b.GF-a.GF||a.idx-b.idx)}
 function thirdRanking(){return Object.keys(GROUPS).map(g=>({...standings(g)[2],group:g})).sort((a,b)=>b.PTS-a.PTS||b.DG-a.DG||b.GF-a.GF||a.idx-b.idx)}
-function qualifiedMap(){let q={};Object.keys(GROUPS).forEach(g=>{let s=standings(g);q[`1º Grupo ${g}`]=s[0];q[`2º Grupo ${g}`]=s[1];});let thirds=thirdRanking().slice(0,8);function pick(label){let gs=label.match(/[A-L]/g)||[];return thirds.find(t=>gs.includes(t.group))||{name:label,flag:"",id:null}};KO.filter(m=>m.round==="r32").forEach(m=>{q[m.home]=q[m.home]||pick(m.home);q[m.away]=q[m.away]||pick(m.away);});return q}
+function qualifiedMap(){
+  let q={};
+  // 1º y 2º de cada grupo
+  Object.keys(GROUPS).forEach(g=>{let s=standings(g);q[`1º Grupo ${g}`]=s[0];q[`2º Grupo ${g}`]=s[1];});
+  // Mejores 8 terceros clasificados
+  let thirds=thirdRanking().slice(0,8);
+  // Slots de terceros en los dieciseisavos (en orden de aparición)
+  const thirdSlots=KO.filter(m=>m.round==="r32").flatMap(m=>[
+    {matchId:m.id,side:"home",label:m.sourceHome},
+    {matchId:m.id,side:"away",label:m.sourceAway}
+  ]).filter(s=>s.label.startsWith("3º"));
+  // Para cada slot de tercero, la lista de grupos elegibles
+  const eligible=thirdSlots.map(s=>({...s,groups:s.label.match(/[A-L]/g)||[]}));
+  // Asignación greedy sin repetición: recorremos los slots por número de
+  // grupos elegibles (ascendente = más restrictivos primero) y asignamos
+  // el mejor tercero disponible que encaje
+  const used=new Set();
+  eligible.sort((a,b)=>a.groups.length-b.groups.length);
+  eligible.forEach(slot=>{
+    const candidate=thirds.find(t=>slot.groups.includes(t.group)&&!used.has(t.group));
+    if(candidate){
+      used.add(candidate.group);
+      q[slot.label]=candidate;
+    } else {
+      q[slot.label]={name:slot.label,flag:"",id:null};
+    }
+  });
+  return q;
+}
 function getTeamFromSlot(slot){const base=qualifiedMap(); if(base[slot]) return base[slot]; const win=slot.match(/^Ganador (\d+)/); if(win) return koWinner(Number(win[1])); const lose=slot.match(/^Perdedor (\d+)/); if(lose) return koLoser(Number(lose[1])); return {name:slot, flag:"", id:null};}
 function getKoExtra(id){return koExtra[id]||{}}
 function setKoExtra(id,field,val){koExtra[id]={...koExtra[id],[field]:val===""?"":Number(val)};save();render(false);}
