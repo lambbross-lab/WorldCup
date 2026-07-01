@@ -705,6 +705,9 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
   <div class="logo-row">
   <div class="logo"><div class="ball">⚽</div><span>Cuaderno digital</span></div>
   <div class="header-actions">
+    <button class="icon-btn" id="exportBtn" title="Guardar copia de seguridad" aria-label="Exportar datos">💾</button>
+    <button class="icon-btn" id="importBtn" title="Restaurar copia de seguridad" aria-label="Importar datos">📂</button>
+    <input type="file" id="importFile" accept=".json" style="display:none">
     <button class="icon-btn" id="installBtn" title="Instalar app" aria-label="Instalar app">📲</button>
     <button class="icon-btn" id="helpBtn" title="Ayuda" aria-label="Ayuda">❓</button>
   </div>
@@ -765,6 +768,44 @@ function save(){
   localStorage.setItem("koScores2026_v8",JSON.stringify(koScores));
   localStorage.setItem("koExtra2026_v8",JSON.stringify(koExtra));
 }
+
+// --- Exportar copia de seguridad ---
+document.getElementById("exportBtn").onclick=()=>{
+  const data={scores,koScores,koExtra,exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="mundial2026_backup_"+new Date().toISOString().slice(0,10)+".json";
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// --- Importar copia de seguridad ---
+document.getElementById("importBtn").onclick=()=>{
+  if(confirm("¿Restaurar una copia de seguridad? Se reemplazarán los datos actuales.")){
+    document.getElementById("importFile").click();
+  }
+};
+document.getElementById("importFile").onchange=function(){
+  const file=this.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data.scores&&!data.koScores){throw new Error("Formato no válido");}
+      scores=data.scores||{};
+      koScores=data.koScores||{};
+      koExtra=data.koExtra||{};
+      save();render();
+      alert("✅ Copia de seguridad restaurada correctamente.");
+    }catch(err){
+      alert("❌ El archivo no es válido o está dañado.");
+    }
+  };
+  reader.readAsText(file);
+  this.value="";
+};
 function fmtDate(d){return d ? new Date(d+"T12:00:00").toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}) : "Fecha pendiente";}
 function shortDate(d){return d ? new Date(d+"T12:00:00").toLocaleDateString("es-ES",{day:"2-digit",month:"2-digit"}) : "—";}
 function teamName(t){return TEAM[t]?.name||t}
@@ -1033,6 +1074,16 @@ render(); if("serviceWorker" in navigator){navigator.serviceWorker.register("./s
     }
   });
 })();
+</script>
+
+<!-- Auto-reload cuando hay nueva versión del Service Worker -->
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    // El SW nuevo ha tomado el control: recargamos para servir la versión actualizada
+    window.location.reload();
+  });
+}
 </script>
 
 </body>
