@@ -1,4 +1,4 @@
-const CACHE = 'mi-world-cup-2026-v20';
+const CACHE = 'mi-world-cup-2026-v21';
 const FILES = ['./', './index.html', './manifest.webmanifest', './assets/logoblancotransparente.png', './assets/icon-192.png', './assets/icon-512.png'];
 
 self.addEventListener('install', e => {
